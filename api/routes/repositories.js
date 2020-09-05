@@ -12,7 +12,7 @@ router.get('/', (req, res, next)=> {
 
 //creating new repo
 router.post('/', (req, res, next)=> {
-    Repositories.findOne({userID: req.body.userID, repoName: req.body.repoName}).exec() //'exec' then 'then' ensures a true promise
+    Repositories.findOne({userID: req.body.userID, repoName: req.body.repoName}).exec() //'exec' then 'then' ensures a true promise (alternative: make mongoose.promise=global.promise)
     .then(data=> {
         if (data) {
             res.status(400).json({
@@ -23,6 +23,7 @@ router.post('/', (req, res, next)=> {
         //Now data is null, we can safely create
         let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
         obj['_id'] = new mongoose.Types.ObjectId();         //fitting obj id into the obj
+        //creation date and last updated are added by default in schema
         const repo = new Repositories(obj);
         //save this
         repo.save() //.save() returns a true promise, unlike .find() etc so don't .exec()
