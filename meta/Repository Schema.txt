@@ -29,5 +29,5 @@ spider, parth29, spiders suck, public, 29-08-2008, 15-09-2008, 2, 1, 0
     }
 
 {
-    "repository_name": "cat", "access": "private", "numStars": "1"
+    "repoName": "cat", "access": "private", "numStars": "1"
 }

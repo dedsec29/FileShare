@@ -1,5 +1,5 @@
 200: Request succeeded
 201: Created successfully
-400: Bad Request
+400: Bad Request (client side)
 404: File not found
-500: Internal server error/Error processing query
+500: Internal server error/Error processing query (server side)

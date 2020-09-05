@@ -66,4 +66,20 @@ router.delete('/:userID/:repoName', (req, res, next)=> {
     });
 });
 
+//update repository details (changing username or repository name should be reflected every other place)
+router.put('/:userID/:repoName', (req, res, next)=> {
+    let userID = req.params.userID;
+    let repoName = req.params.repoName;
+    let obj = JSON.parse(JSON.stringify(req.body));     //copying body elements
+    Repositories.updateOne({userID:userID, repoName:repoName}, {$set: obj}).exec()
+    .then(results=> {
+        console.log(results);
+        res.status(200).json(results);
+    })
+    .catch(err=> {
+        console.log(err);
+        res.status(400).json({error:err});
+    })
+}); 
+
 module.exports = router;
