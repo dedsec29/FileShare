@@ -12,12 +12,12 @@ router.get('/', (req, res, next)=> {
 
 //creating new repo
 router.post('/', (req, res, next)=> {
-    Repositories.findOne({userID: req.body.userID, repoName: req.body.repoName})
+    Repositories.findOne({userID: req.body.userID, repoName: req.body.repoName}).exec() //'exec' then 'then' ensures a true promise
     .then(data=> {
         if (data) {
-            res.status(400).json(400).json({
+            res.status(400).json({
                 message: "This repository for the user already exists"
-            })
+            });
             return;
         }
         //Now data is null, we can safely create
@@ -25,7 +25,7 @@ router.post('/', (req, res, next)=> {
         obj['_id'] = new mongoose.Types.ObjectId();         //fitting obj id into the obj
         const repo = new Repositories(obj);
         //save this
-        repo.save()
+        repo.save() //.save() returns a true promise, unlike .find() etc so don't .exec()
         .then(results=> { //sending appropriate status
             console.log(results);
             res.status(201).json({
@@ -40,9 +40,7 @@ router.post('/', (req, res, next)=> {
     })
     .catch(err=> {
         console.log(err);
-        res.status(400).json(400).json({
-            message: "Incorrect repository name or userID"
-        });
+        res.status(400).json({error: err});
     });
 });
 
@@ -54,6 +52,18 @@ router.get('/all', (req, res, next)=> {
         console.log(err);
         res.status(500).json({error: err});
     })
+});
+
+//delete a repository
+router.delete('/:userID/:repoName', (req, res, next)=> {
+    let userID = req.params.userID;
+    let repoName = req.params.repoName;
+    Repositories.deleteOne({userID:userID, repoName:repoName}).exec()
+    .then(results=> res.status(200).json(results))
+    .catch(err=> {
+        console.log(err);
+        res.status(500).json({error: err});
+    });
 });
 
 module.exports = router;
