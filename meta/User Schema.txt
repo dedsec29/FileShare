@@ -1,0 +1,15 @@
+User ID         (userID)
+Name            (name)
+E-mail          (email)
+Password        (password)
+Status          (status)
+
+//could add contributions, followers, following, etc
+
+{
+    "userID":"parth29", "name":"parth", "email":"12@12.com", "password":"abc", "status":"offline"
+}
+
+{
+    "name":"parth pawar", "email":"123@123.com", "password":"xyz", "status":"online"
+}

@@ -1,0 +1,33 @@
+Repository Name		    (repoName)
+User ID			        (userID)
+Description		        (description)
+Access			        (access) //public or private
+Date of Creation	    (creationDate)
+Last Updated		    (lastUpdated)
+Visits			        (numVisits)
+Number of Forks		    (numForks)
+Number of Stars 	    (numStars)
+
+spider, parth29, spiders suck, public, 29-08-2008, 15-09-2008, 2, 1, 0
+
+{
+    "repoName": "spider", "userID": "parth29", "description": "spiders suck",
+    "access": "public", "creationDate": "2008-08-29", "lastUpdated": "2008-09-15",
+    "numVisits": "2", "numForks": "1", "numStars": "0"
+}
+
+{
+        "repository_name": "okay",
+        "userID": "parth29",
+        "description": "yes yes",
+        "access": "private",
+        "creation_date": "29-08-2000",
+        "last_updated": "15-09-2001",
+        "numVisits": "0",
+        "numForks": "0",
+        "numStars": "1"
+    }
+
+{
+    "repository_name": "cat", "access": "private", "numStars": "1"
+}
