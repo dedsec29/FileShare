@@ -1,5 +1,5 @@
 Repository Name		    (repoName)
-User ID			        (userID)
+User ID     		    (userID)
 Description		        (description)
 Access			        (access) //public or private
 Date of Creation	    (creationDate)
