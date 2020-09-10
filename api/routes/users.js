@@ -93,7 +93,7 @@ router.put('/:userID', (req, res, next)=> {
     .then(results1=> {
         if (results1['nModified']==0) {
             console.log(results1)
-            if (results1['n'==0]) {
+            if (results1['n']==0) {
                 res.status(400).json({
                     message: "User does not exist, cannot update", 
                     result: results1

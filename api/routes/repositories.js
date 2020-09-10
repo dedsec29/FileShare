@@ -56,16 +56,18 @@ router.delete('/:userID/:repoName', (req, res, next)=> {
     let repoName = req.params.repoName;
     Repository.deleteOne({userID:userID, repoName:repoName}).exec()
     .then(results=> {
+        console.log(results);
         if (results['deletedCount']!=0) {
-            console.log(results);
             res.status(200).json({
                 message: "Deleted Successfully",
                 result: results
             });
         }
         else {
-            console.log("Couldn't find such repository or userID or combination of both");
-            res.status(400).json({message: "Couldn't find such repository or userID or combination of both"});
+            res.status(400).json({
+                message: "Couldn't find such repository or userID or combination of both",
+                result: results
+            });
         }
     })
     .catch(err=> {
@@ -81,16 +83,26 @@ router.put('/:userID/:repoName', (req, res, next)=> {
     let obj = JSON.parse(JSON.stringify(req.body));     //copying body elements (can additionally ensure that userID is not in body received)
     Repository.updateOne({userID:userID, repoName:repoName}, {$set: obj}).exec()
     .then(results=> {
+        console.log(results);
         if (results['nModified']!=0) {
-            console.log(results);
             res.status(200).json({
                 message: "Update successful",
                 result: results
             });
         }
         else {
-            console.log("Couldn't find such repository or userID or combination of both");
-            res.status(404).json({message: "Couldn't find such repository or userID or combination of both"});
+            if (results['n']!=0) {
+                res.status(400).json({
+                    message: "Couldn't find such repository or userID or combination of both",
+                    result: results
+                });
+            }
+            else { //Did not update because details were same as original
+                res.status(200).json({
+                    message: "Nothing to update",
+                    result: results
+                })
+            }
         }
     })
     .catch(err=> {

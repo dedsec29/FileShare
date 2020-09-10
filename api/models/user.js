@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const regexForEmailValidation = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 const userSchema = mongoose.Schema({
     userID: {
@@ -18,7 +19,7 @@ const userSchema = mongoose.Schema({
         trim: true,
         validate: {
             validator: (v)=>{
-                return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+                return regexForEmailValidation.test(v);
             },
             message: "Invalid e-mail"
         }
