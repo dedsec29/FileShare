@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const regexForEmailValidation = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+const regexForEmailValidation = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
 const userSchema = mongoose.Schema({
     userID: {
@@ -17,18 +17,11 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Email required"],
         trim: true,
-        validate: {
-            validator: (v)=>{
-                return regexForEmailValidation.test(v);
-            },
-            message: "Invalid e-mail"
-        }
+        match: regexForEmailValidation
     },
     password: {
         type: String,
         required: [true, "Password required"],
-        minlength: [6, "Password should be at least 6 characters long"],
-        maxlength: [15, "Password should be at most 15 characters long"]
     },
     status: String,
     },

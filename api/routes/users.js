@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt");
 
 const Repository = require('../models/repository');
 const User = require('../models/user'); //collection (mongo by default makes this to plural)
@@ -18,22 +19,31 @@ router.post('/', (req, res, next)=> {
     User.findOne({userID: req.body.userID}).exec()
     .then(data=> {
         if (data) {
-            res.status(400).json({message: "User ID taken"});
+            res.status(409).json({message: "User ID taken"});
             return;
         }
         let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
-        let userObj = new User(obj);
-        userObj.save()
-        .then(results=> {
-            console.log(results);
-            res.status(201).json({
-                message: "Handling POST requests to /users",
-                createdUser: results
-            });
-        })
-        .catch(err=> {
-            console.log(err);
-            res.status(500).json({error: err});
+        //hash the password
+        bcrypt.hash(obj['password'], 10, (err, hash)=> {    //10 is the salt argument
+            if (err) {
+                return res.status(500).json({error: err});
+            }
+            else {
+                obj['password'] = hash;
+                let userObj = new User(obj);
+                userObj.save()
+                .then(results=> {
+                    console.log(results);
+                    res.status(201).json({
+                        message: "Handling POST requests to /users",
+                        createdUser: results
+                    });
+                })
+                .catch(err=> {
+                    console.log(err);
+                    res.status(500).json({error: err});
+                });
+            }
         });
     })
     .catch(err=> {
