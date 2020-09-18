@@ -173,8 +173,20 @@ router.post('/login', (req, res, next)=> {
         bcrypt.compare(req.body.password, user[0].password)
         .then(result=> {
             if (result) {
+                const token = jwt.sign(
+                    {   //payload of token
+                        userID: user[0].userID,
+                        email: user[0].email
+                    },
+                    process.env.JWT_KEY,
+                    {
+                        expiresIn: "1h"
+                    }
+                );
+
                 return res.status(200).json({
-                    message: "Authorization successful"
+                    message: "Authorization successful",
+                    token: token
                 });
             }
             else {
