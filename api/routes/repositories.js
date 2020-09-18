@@ -10,7 +10,7 @@ router.get('/', (req, res, next)=> {
 
 //creating new repo
 router.post('/', (req, res, next)=> {
-    Repository.findOne({userID: req.body.userID, repoName: req.body.repoName}).exec() //'exec' then 'then' ensures a true promise (alternative: make mongoose.promise=global.promise)
+    Repository.exists({userID: req.body.userID, repoName: req.body.repoName})
     .then(data=> {
         if (data) {
             res.status(409).json({message: "This repository for the user already exists"});

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const Repository = require('../models/repository');
 const User = require('../models/user'); //collection (mongo by default makes this to plural)
@@ -15,8 +16,8 @@ router.get('/', (req, res, next)=> {
 });
 
 //create new user
-router.post('/', (req, res, next)=> {
-    User.findOne({userID: req.body.userID}).exec()
+router.post('/signup', (req, res, next)=> {
+    User.exists({userID: req.body.userID})
     .then(data=> {
         if (data) {
             res.status(409).json({message: "User ID taken"});
@@ -24,12 +25,10 @@ router.post('/', (req, res, next)=> {
         }
         let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
         //hash the password
-        bcrypt.hash(obj['password'], 10, (err, hash)=> {    //10 is the salt argument
-            if (err) {
-                return res.status(500).json({error: err});
-            }
-            else {
+        bcrypt.hash(obj['password'], 10)     //10 is the salt argument
+        .then(hash=> {
                 obj['password'] = hash;
+                obj['email'] = obj['email'].toLowerCase();
                 let userObj = new User(obj);
                 userObj.save()
                 .then(results=> {
@@ -43,8 +42,14 @@ router.post('/', (req, res, next)=> {
                     console.log(err);
                     res.status(500).json({error: err});
                 });
-            }
+        })    
+        .catch(err=> {
+            res.status(500).json({
+                error: err,
+                message: "Password and/or Email field missing"
+            });
         });
+        
     })
     .catch(err=> {
         console.log(err);
@@ -146,5 +151,44 @@ router.put('/:userID', (req, res, next)=> {
         res.status(500).json({error: err});
     });
 });
+
+router.post('/login', (req, res, next)=> {
+    //User can log in using either email or userID
+    let qry = {};
+    if (req.body.hasOwnProperty('userID'))
+        qry['userID'] = req.body.userID;
+    else if (req.body.hasOwnProperty('email'))
+        qry['email'] = req.body.email;
+    else 
+        return res.status(400).json({message: "Email or UserID was not provided"});
+
+    if (req.body.hasOwnProperty('password')==false)
+        return res.status(400).json({message: "Password was not provided"});
+    
+    User.find(qry).exec()
+    .then(user=> {
+        if (user.length < 1) {
+            return res.status(401).json({message: "Authorization failed"}); //do not indicate that user doesn't exist for security reasons
+        }
+        bcrypt.compare(req.body.password, user[0].password)
+        .then(result=> {
+            if (result) {
+                return res.status(200).json({
+                    message: "Authorization successful"
+                });
+            }
+            else {
+                return res.status(401).json({message: "Authorization failed"});
+            }
+        })
+        .catch(err=> {
+            res.status(401).json({message: "Authorization failed"});
+        });
+    })
+    .catch(err=> {
+        console.log(err);
+        res.status(500).json({error: err});
+    });
+})
 
 module.exports = router;

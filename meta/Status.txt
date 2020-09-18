@@ -4,3 +4,4 @@
 404: File not found
 500: Internal server error/Error processing query (server side)
 409: Conflict response
+401: Authorisation failed
