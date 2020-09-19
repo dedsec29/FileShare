@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const checkAuth = require('../middleware/check-auth');
+
 const Repository = require('../models/repository');
 const User = require('../models/user'); //collection (mongo by default makes this to plural)
 
@@ -57,8 +59,9 @@ router.post('/signup', (req, res, next)=> {
     });
 });
 
-//display all users
-router.get('/all', (req, res, next)=> {
+/*  Display all users (For future: Remember to not display password of users.
+    Also display selective details if user 'Access' is private) */
+router.get('/all', checkAuth, (req, res, next)=> {
     User.find()
     .then(results=> {res.send(results); console.log(results)})
     .catch(err=> {
@@ -68,7 +71,7 @@ router.get('/all', (req, res, next)=> {
 });
 
 //delete a user, also all its repositories too
-router.delete('/:userID', (req, res, next)=> {
+router.delete('/:userID', checkAuth,(req, res, next)=> {
     let userID = req.params.userID;
     User.deleteOne({userID: userID}).exec()
     .then(results1=> {
@@ -101,7 +104,7 @@ router.delete('/:userID', (req, res, next)=> {
 });
 
 //update user details. If userID itself is changed, reflect the changes on Repository model as well
-router.put('/:userID', (req, res, next)=> {
+router.put('/:userID', checkAuth, (req, res, next)=> {
     let userID = req.params.userID;
     let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
     User.updateOne({userID: userID}, {$set: obj}).exec()

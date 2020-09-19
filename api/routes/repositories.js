@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
+const checkAuth = require('../middleware/check-auth');
+
 const Repository = require('../models/repository'); //collection (mongo by default makes this to plural)
 
 router.get('/', (req, res, next)=> {
@@ -9,7 +11,7 @@ router.get('/', (req, res, next)=> {
 });
 
 //creating new repo
-router.post('/', (req, res, next)=> {
+router.post('/', checkAuth, (req, res, next)=> {
     Repository.exists({userID: req.body.userID, repoName: req.body.repoName})
     .then(data=> {
         if (data) {
@@ -41,7 +43,7 @@ router.post('/', (req, res, next)=> {
 });
 
 //display all repositories
-router.get('/all', (req, res, next)=> {
+router.get('/all', checkAuth, (req, res, next)=> {
     Repository.find()
     .then(results=> {res.send(results); console.log(results)})
     .catch(err=> {
@@ -51,7 +53,7 @@ router.get('/all', (req, res, next)=> {
 });
 
 //delete a repository
-router.delete('/:userID/:repoName', (req, res, next)=> {
+router.delete('/:userID/:repoName', checkAuth, (req, res, next)=> {
     let userID = req.params.userID;
     let repoName = req.params.repoName;
     Repository.deleteOne({userID:userID, repoName:repoName}).exec()
@@ -77,7 +79,7 @@ router.delete('/:userID/:repoName', (req, res, next)=> {
 });
 
 //update repository details 
-router.put('/:userID/:repoName', (req, res, next)=> {
+router.put('/:userID/:repoName', checkAuth, (req, res, next)=> {
     let userID = req.params.userID;
     let repoName = req.params.repoName;
     let obj = JSON.parse(JSON.stringify(req.body));     //copying body elements (can additionally ensure that userID is not in body received)
