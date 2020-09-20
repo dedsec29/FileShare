@@ -9,9 +9,7 @@ const checkAuth = require('../middleware/check-auth');
 const Repository = require('../models/repository');
 const User = require('../models/user'); //collection (mongo by default makes this to plural)
 
-/* Used .then(.then()) in place of .then(throw err).then().catch() because:
-    Code has multiple nested if else blocks within a .then() itself
-*/
+const saltAmount = 10;
 
 router.get('/', (req, res, next)=> {
     res.status(200).json({message: 'Handling GET requests to /users'});
@@ -19,49 +17,51 @@ router.get('/', (req, res, next)=> {
 
 //create new user
 router.post('/signup', (req, res, next)=> {
+    if (!req.body.hasOwnProperty('email') || !req.body.hasOwnProperty('userID') || !req.body.hasOwnProperty('password')) {
+        return res.status(400).json({message: "Missing required details"});
+    }
     User.exists({userID: req.body.userID})
-    .then(data=> {
-        if (data) {
-            res.status(409).json({message: "User ID taken"});
-            return;
+    .then(data1=> {
+        if (data1) {
+            return res.status(409).json({message: "User ID taken"});
         }
-        let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
-        //hash the password
-        bcrypt.hash(obj['password'], 10)     //10 is the salt argument
-        .then(hash=> {
-                obj['password'] = hash;
-                obj['email'] = obj['email'].toLowerCase();
-                let userObj = new User(obj);
-                userObj.save()
-                .then(results=> {
-                    console.log(results);
-                    res.status(201).json({
-                        message: "Handling POST requests to /users",
-                        createdUser: results
-                    });
-                })
-                .catch(err=> {
-                    console.log(err);
-                    res.status(500).json({error: err});
-                });
-        })    
-        .catch(err=> {
-            res.status(500).json({
-                error: err,
-                message: "Password and/or Email field missing"
+        User.exists({email: req.body.email})
+        .then(data2=> {
+            if (data2) {
+                return res.status(409).json({message: "Email ID taken"});
+            }
+            let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
+            //hash the password
+            bcrypt.hash(obj['password'], saltAmount)
+            .then(hash=> {
+                    obj['password'] = hash;
+                    obj['email'] = obj['email'].toLowerCase();
+                    let userObj = new User(obj);
+                    return userObj.save()
+            }) 
+            .then(results=> {
+                console.log(results);
+                res.status(201).json({message: "User created"});
+            })   
+            .catch(err=> {
+                console.log(err);
+                res.status(500).json({error: err});
             });
+        })
+        .catch(err=> {
+            console.log(err);
+            res.status(500).json({error: err});
         });
-        
     })
     .catch(err=> {
         console.log(err);
-        res.status(400).json({error: err});
+        res.status(500).json({error: err});
     });
 });
 
 /*  Display all users (For future: Remember to not display password of users.
     Also display selective details if user 'Access' is private) */
-router.get('/all', checkAuth, (req, res, next)=> {
+router.get('/all', (req, res, next)=> {
     User.find()
     .then(results=> {res.send(results); console.log(results)})
     .catch(err=> {
@@ -86,10 +86,7 @@ router.delete('/:userID', checkAuth,(req, res, next)=> {
             Repository.deleteMany({userID: userID}).exec()
             .then(results2=> {
                 console.log(results2);
-                res.status(200).json({
-                    message: "deletion successful",
-                    result: results2
-                });
+                res.status(200).json({message: "deletion successful",});
             })
             .catch(err=> {
                 console.log(err);
@@ -104,23 +101,30 @@ router.delete('/:userID', checkAuth,(req, res, next)=> {
 });
 
 //update user details. If userID itself is changed, reflect the changes on Repository model as well
-router.put('/:userID', checkAuth, (req, res, next)=> {
+router.put('/:userID', checkAuth, async (req, res, next)=> {
     let userID = req.params.userID;
     let obj = JSON.parse(JSON.stringify(req.body));    //copying body elements
+    if (obj.hasOwnProperty('password')) { //password needed to be updated needs to be hashed too
+        try {
+            obj['password'] = await bcrypt.hash(obj['password'], saltAmount);
+        }
+        catch(err) {
+            console.log(err);
+            return res.status(500).json({error: err});
+        }
+    }
     User.updateOne({userID: userID}, {$set: obj}).exec()
     .then(results1=> {
         if (results1['nModified']==0) {
             console.log(results1)
             if (results1['n']==0) {
                 res.status(400).json({
-                    message: "User does not exist, cannot update", 
-                    result: results1
+                    message: "User does not exist, cannot update"
                 });
             }
             else {  //else it means that user exists, but details were same as original
                 res.status(200).json({
-                    message: "Nothing to update",
-                    result: results1
+                    message: "Nothing to update"
                 });
             }
         }
@@ -131,8 +135,7 @@ router.put('/:userID', checkAuth, (req, res, next)=> {
                 .then(results2=> {
                     console.log(results2);
                     res.status(200).json({
-                        message: "Updates Applied",
-                        result: results2
+                        message: "Updates Applied"
                     }); 
                 })
                 .catch(err=> {
@@ -143,8 +146,7 @@ router.put('/:userID', checkAuth, (req, res, next)=> {
             else {
                 console.log(results1);
                 res.status(200).json({
-                    message: "Updates Applied",
-                    result: results1
+                    message: "Updates Applied"
                 }); 
             }
         }

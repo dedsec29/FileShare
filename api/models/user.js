@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
         type: String, 
         required: [true, "User ID required"],
         trim: true,
-        index: {unique: true},
+        index: {unique: true}
     },
     name: {
         type: String,
@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Email required"],
         trim: true,
+        index: {unique: true},
         match: regexForEmailValidation
     },
     password: {

@@ -11,7 +11,7 @@ router.get('/', (req, res, next)=> {
 });
 
 //creating new repo
-router.post('/', checkAuth, (req, res, next)=> {
+router.post('/:userID', checkAuth, (req, res, next)=> {
     Repository.exists({userID: req.body.userID, repoName: req.body.repoName})
     .then(data=> {
         if (data) {
@@ -27,7 +27,7 @@ router.post('/', checkAuth, (req, res, next)=> {
         .then(results=> { //sending appropriate status
             console.log(results);
             res.status(201).json({
-                message: "Handling POST requests to /repositories",
+                message: "Handling POST requests to /repositories/"+req.params.userID,
                 createdRepository: results
             });
         })
@@ -43,7 +43,7 @@ router.post('/', checkAuth, (req, res, next)=> {
 });
 
 //display all repositories
-router.get('/all', checkAuth, (req, res, next)=> {
+router.get('/all', (req, res, next)=> {
     Repository.find()
     .then(results=> {res.send(results); console.log(results)})
     .catch(err=> {
@@ -95,7 +95,7 @@ router.put('/:userID/:repoName', checkAuth, (req, res, next)=> {
         else {
             if (results['n']!=0) {
                 res.status(400).json({
-                    message: "Couldn't find such repository or userID or combination of both",
+                    message: "Couldn't find such repository", //if could not find userID, We will throw auth error for security reasons (in check-auth middleware)
                     result: results
                 });
             }

@@ -12,7 +12,7 @@ spider, parth29, spiders suck, public, 29-08-2008, 15-09-2008, 2, 1, 0
 
 {
     "repoName": "spider", "userID": "parth29", "description": "spiders suck",
-    "access": "public", "creationDate": "2008-08-29", "lastUpdated": "2008-09-15",
+    "access": "public",
     "numVisits": "2", "numForks": "1", "numStars": "0"
 }
 
@@ -26,7 +26,7 @@ spider, parth29, spiders suck, public, 29-08-2008, 15-09-2008, 2, 1, 0
         "numVisits": "0",
         "numForks": "0",
         "numStars": "1"
-    }
+}
 
 {
     "repoName": "cat", "access": "private", "numStars": "1"
