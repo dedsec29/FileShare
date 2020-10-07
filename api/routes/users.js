@@ -4,8 +4,8 @@ const router = express.Router();
 const checkAuth = require('../middleware/check-auth');
 const UsersController = require('../controllers/users');
 
-router.get('/', (req, res, next)=> {
-    res.status(200).json({message: 'Handling GET requests to /users'});
+router.get('/', (req, res) => {
+  res.status(200).json({ message: 'Handling GET requests to /users' });
 });
 
 //create new user
