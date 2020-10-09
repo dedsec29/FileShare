@@ -8,7 +8,6 @@ const uploadSchema = mongoose.Schema({
   },
   picture: {
     type: String,
-    required: [true, 'Picture required'],
   },
 });
 
