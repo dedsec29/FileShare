@@ -26,24 +26,13 @@ app.use((req, res, next) => {
   next();
 });
 
-const connectionString =
-  'mongodb+srv://Parth:' +
-  process.env.DB_PASSWORD +
-  '@cluster0.5b4sy.mongodb.net/' +
-  process.env.DB_NAME +
-  '?retryWrites=true&w=majority';
-mongoose
-  .connect(connectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
-  .then(() => console.log('Connected to database!'))
-  .catch((err) => console.log(err));
-
 const repoRoute = require('./api/routes/repositories');
 const usersRoute = require('./api/routes/users');
 const uploadRoute = require('./api/routes/uploads');
+const connectDB = require('./config/db');
+
+//setting up connection
+connectDB.dbConnection();
 
 //initialising routes
 app.use('/repositories', repoRoute);
@@ -57,7 +46,6 @@ app.use((req, res, next) => {
   next(error);
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.json({ error: { message: error.message } });
