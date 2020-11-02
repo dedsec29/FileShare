@@ -29,10 +29,10 @@ app.use((req, res, next) => {
 const repoRoute = require('./api/routes/repositories');
 const usersRoute = require('./api/routes/users');
 const uploadRoute = require('./api/routes/uploads');
-const connectDB = require('./config/db');
+const dbConnection = require('./api/config/db');
 
 //setting up connection
-connectDB.dbConnection();
+dbConnection();
 
 //initialising routes
 app.use('/repositories', repoRoute);
