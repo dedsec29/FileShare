@@ -3,3 +3,4 @@
 .prettierc
 .eslintrc.json
 uploads/*
+.nyc_output/

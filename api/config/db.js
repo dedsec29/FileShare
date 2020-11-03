@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
+const setupEnv = require('./env');  //for testing 
+setupEnv();
 
 //get current env variable
-const envStr = process.env.NODE_ENV.toUpperCase();
+var envStr = process.env.NODE_ENV;
+console.log(envStr);
+envStr = envStr.toUpperCase();
 
 const connectionString =
   'mongodb+srv://Parth:' +

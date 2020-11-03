@@ -9,8 +9,10 @@ const saltAmount = 10;
 const tokenExpireTime = "1h";
 
 exports.createUser = (req, res, next)=> {
-    if (!req.body.hasOwnProperty('email') || !req.body.hasOwnProperty('userID') || !req.body.hasOwnProperty('password')) {
-        return res.status(400).json({message: "Missing required details"});
+    const requiredFields = ['email', 'userID', 'password', 'name'];
+    for (let prop of requiredFields) {
+        if (!req.body.hasOwnProperty(prop))
+            return res.status(400).json({message: "Missing required details"});
     }
     User.exists({userID: req.body.userID})
     .then(data1=> {
@@ -26,13 +28,13 @@ exports.createUser = (req, res, next)=> {
             //hash the password
             bcrypt.hash(obj['password'], saltAmount)
             .then(hash=> {
-                    obj['password'] = hash;
-                    obj['email'] = obj['email'].toLowerCase();
-                    let userObj = new User(obj);
-                    return userObj.save()
+                obj['password'] = hash;
+                obj['email'] = obj['email'].toLowerCase();
+                let userObj = new User(obj);
+                return userObj.save()
             }) 
             .then(results=> {
-                console.log(results);
+                //console.log(results);
                 res.status(201).json({message: "User created"});
             })   
             .catch(err=> {
@@ -65,7 +67,7 @@ exports.deleteUser = (req, res, next)=> {
     User.deleteOne({userID: userID}).exec()
     .then(results1=> {
         if (results1['deletedCount']==0) {
-            console.log(results1);
+            //console.log(results1);
             res.status(400).json({
                 message: "User does not exist, cannot delete",
                 result: results1
@@ -74,7 +76,7 @@ exports.deleteUser = (req, res, next)=> {
         else {
             Repository.deleteMany({userID: userID}).exec()
             .then(results2=> {
-                console.log(results2);
+                //console.log(results2);
                 res.status(200).json({message: "deletion successful",});
             })
             .catch(err=> {
@@ -104,7 +106,7 @@ exports.updateUser = async (req, res, next)=> {
     User.updateOne({userID: userID}, {$set: obj}).exec()
     .then(results1=> {
         if (results1['nModified']==0) {
-            console.log(results1)
+            //console.log(results1)
             if (results1['n']==0) {
                 res.status(400).json({
                     message: "User does not exist, cannot update"
@@ -121,7 +123,7 @@ exports.updateUser = async (req, res, next)=> {
             if (obj.hasOwnProperty('userID') && userID!=obj['userID']) {
                 Repository.updateMany({userID: userID}, {$set: {userID: obj['userID']} }).exec()
                 .then(results2=> {
-                    console.log(results2);
+                    //console.log(results2);
                     res.status(200).json({
                         message: "Updates Applied"
                     }); 
@@ -132,7 +134,7 @@ exports.updateUser = async (req, res, next)=> {
                 });
             }
             else {
-                console.log(results1);
+                //console.log(results1);
                 res.status(200).json({
                     message: "Updates Applied"
                 }); 
@@ -173,7 +175,7 @@ exports.login = (req, res, next)=> {
                     },
                     process.env.JWT_KEY,
                     {
-                        expiresIn: "1h"
+                        expiresIn: tokenExpireTime
                     }
                 );
 
