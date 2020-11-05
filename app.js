@@ -5,7 +5,8 @@ const morgan = require('morgan'); //to log incoming requests
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-app.use(morgan('dev'));
+if (process.env.NODE_ENV!=='testing')
+  app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
