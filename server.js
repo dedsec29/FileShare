@@ -1,12 +1,11 @@
 const express = require('express');
 
-// eslint-disable-next-line no-undef
-if (process.env.NODE_ENV !== 'production')
-  //if still in dev stage, use the env variables
-  require('dotenv').config();
+const setupEnv = require('./api/config/env');
+const dbConnection = require('./api/config/db');
+setupEnv();
+dbConnection();
 
 const app = require('./app');
-// eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
 
 const server = express();
