@@ -1,2 +1,8 @@
-This project attempts to make a distilled clone of GitHub.
-This project is being developed incrementally.
+This is a project which allows users to upload and Share Files.
+
+Technologies used:
+Node.js
+Express.js
+MongoDB
+Chai
+Mocha
